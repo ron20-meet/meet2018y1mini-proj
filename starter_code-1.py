@@ -19,7 +19,7 @@ turtle.penup()
 
 SQUARE_SIZE = 20
 START_LENGTH = 10
-
+score=0
 #Initialize lists
 pos_list = []
 stamp_list = []
@@ -140,7 +140,9 @@ def move_snake():
     new_pos = snake.pos()
     new_x_pos = new_pos[0]
     new_y_pos = new_pos[1]
-    
+
+    if snake.pos() in pos_list[:-1]:
+        quit()
     
     if direction==RIGHT:
         snake.goto(x_pos + SQUARE_SIZE, y_pos)
@@ -164,6 +166,8 @@ def move_snake():
     if new_y_pos <= DOWN_EDGE:
         print("you hit the down edge! Game over!")
         quit()
+    
+        
     #4. Write the conditions for UP and DOWN on your own
     ##### YOUR CODE HERE
     
@@ -175,15 +179,16 @@ def move_snake():
     pos_list.append(my_pos)
     new_stamp = snake.stamp()
     stamp_list.append(new_stamp)
+
+    
     ######## SPECIAL PLACE - Remember it for Part 5
     #pop zeroth element in pos_list to get rid of last the last 
     #piece of the tail
-    old_stamp = stamp_list.pop(0)
-    snake.clearstamp(old_stamp)
-    pos_list.pop(0)
-
+    
+    
         ######## SPECIAL PLACE - Remember it for Part 5
     global food_stamps, food_pos
+    global score
     #If snake is on top of food item
     if snake.pos() in food_pos:
         food_ind=food_pos.index(snake.pos()) #What does this do?
@@ -192,16 +197,23 @@ def move_snake():
         food_pos.pop(food_ind) #Remove eaten food position
         food_stamps.pop(food_ind) #Remove eaten food stamp
         print("You have eaten the food!")
+        score+=1
+        make_food()
+    else:
+        old_stamp = stamp_list.pop(0)
+        snake.clearstamp(old_stamp)
+        pos_list.pop(0)
+    turtle.write(score, move=False, align="left", font=("Arial", 30, "normal") )
+    
     
     #HINT: This if statement may be useful for Part 8
 
-    ...
     #Don't change the rest of the code in move_snake() function:
     #If you have included the timer so the snake moves 
     #automatically, the function should finish as before with a 
     #call to ontimer()
 
-
+    
     if len (food_stamps)<=6:
         make_food()
     turtle.ontimer(move_snake,TIME_STEP)
@@ -216,13 +228,15 @@ for i in food_pos :
     food.goto(i[0],i[1])
     stamp=food.stamp()
     food_stamps.append(stamp)
+    
 
-    
-    
-    
+turtle.bgcolor("light blue")
+turtle.color("purple")
+
 move_snake()
 
 
 
 
      
+
