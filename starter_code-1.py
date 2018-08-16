@@ -7,9 +7,11 @@ Name:
 Date:
 """
 import turtle
+import time
 import random #We'll need this later in the lab
 
 turtle.tracer(1,0) #This helps the turtle move more smoothly
+border = turtle.clone()
 
 SIZE_X=800
 SIZE_Y=500
@@ -25,7 +27,12 @@ pos_list = []
 stamp_list = []
 food_pos = []
 food_stamps = []
+small_stamps = []
+small_pos = []
 
+ron = turtle.Turtle()
+
+small = turtle.Turtle()
 #Set up positions (x,y) of boxes that make up the snake
 snake = turtle.clone()
 snake.shape("square")
@@ -130,10 +137,26 @@ def make_food():
     stamp =food.stamp()
     food_pos.append((food_x,food_y))
     food_stamps.append(stamp)
-    
 
+def make_small():
+    min_x=-int(SIZE_X/2/SQUARE_SIZE)+1
+    max_x=int(SIZE_X/2/SQUARE_SIZE)-1
+    min_y=-int(SIZE_Y/2/SQUARE_SIZE)-1
+    max_y=int(SIZE_Y/2/SQUARE_SIZE)+1
+    
+    
+    small_x = random.randint(min_x,max_x)*SQUARE_SIZE
+    small_y = random.randint(min_y,max_y)*SQUARE_SIZE
+    
+    small.goto(small_x,small_y)
+    stamp =small.stamp()
+    small_pos.append((small_x,small_y))
+    small_stamps.append(stamp)
+    
       
 def move_snake():
+    color_tup = ("blue", 'green' , 'red', 'purple', 'orange', 'yellow')
+     
     my_pos = snake.pos()
     x_pos = my_pos[0]
     y_pos = my_pos[1]
@@ -142,10 +165,15 @@ def move_snake():
     new_y_pos = new_pos[1]
 
     if snake.pos() in pos_list[:-1]:
+        small.penup()
+        small.goto(0,0)
+        small.write("GAME OVER", move=False, align="center", font=("Arial", 30, "normal"))
+        time.sleep(3)
         quit()
     
     if direction==RIGHT:
         snake.goto(x_pos + SQUARE_SIZE, y_pos)
+        ##snake.color = color_list[random.randint(1, len(color_list))]
         print("You moved right!")
     elif direction==LEFT:
         snake.goto(x_pos - SQUARE_SIZE, y_pos)
@@ -156,15 +184,31 @@ def move_snake():
         snake.goto(x_pos, y_pos - SQUARE_SIZE)
     if new_x_pos >= RIGHT_EDGE:
         print("you hit the right adge! Game over!")
+        small.penup()
+        small.goto(0,0)
+        small.write("GAME OVER", move=False, align="center", font=("Arial", 30, "normal") )
+        time.sleep(3)
         quit()
     if new_x_pos <= LEFT_EDGE:
         print("you hit the left adge! Game over!")
+        small.penup()
+        small.goto(0,0)
+        small.write("GAME OVER", move=False, align="center", font=("Arial", 30, "normal") )
+        time.sleep(3)
         quit()
     if new_y_pos >= UP_EDGE:
         print("you hit the up edge! Game over!")
+        small.penup()
+        small.goto(0,0)
+        small.write("GAME OVER", move=False, align="center", font=("Arial", 30, "normal") )
+        time.sleep(3)
         quit()
     if new_y_pos <= DOWN_EDGE:
         print("you hit the down edge! Game over!")
+        small.penup()
+        small.goto(0,0)
+        small.write("GAME OVER", move=False, align="center", font=("Arial", 30, "normal") )
+        time.sleep(3)
         quit()
     
         
@@ -197,13 +241,27 @@ def move_snake():
         food_pos.pop(food_ind) #Remove eaten food position
         food_stamps.pop(food_ind) #Remove eaten food stamp
         print("You have eaten the food!")
+        ron.clear()
+        ron.write(score, move=False, align="left", font=("Arial", 30, "normal") )
         score+=1
+        snake.color(color_tup[random.randint(0,5)])
         make_food()
+        make_small()
     else:
         old_stamp = stamp_list.pop(0)
         snake.clearstamp(old_stamp)
         pos_list.pop(0)
-    turtle.write(score, move=False, align="left", font=("Arial", 30, "normal") )
+
+    
+    global small_pos
+    if snake.pos() in small_pos:
+         print ("You ate the mouse, GAME OVER")
+         small.penup()
+         small.goto(0,0)
+         small.write("GAME OVER", move=False, align="center", font=("Arial", 30, "normal") )
+         time.sleep(3)
+         quit()
+        
     
     
     #HINT: This if statement may be useful for Part 8
@@ -218,7 +276,7 @@ def move_snake():
         make_food()
     turtle.ontimer(move_snake,TIME_STEP)
 
-    
+  
 turtle.register_shape("trash.gif")
 food = turtle.clone()
 food.shape("trash.gif")
@@ -228,10 +286,21 @@ for i in food_pos :
     food.goto(i[0],i[1])
     stamp=food.stamp()
     food_stamps.append(stamp)
-    
 
-turtle.bgcolor("light blue")
+turtle.register_shape("small.gif")
+small = turtle.clone()
+small.shape("small.gif")
+small_pos = [(200,200),(-200,200), (-200,-200), (200,-100)]
+for i in small_pos :
+    small.goto(i[0],i[1])
+    stamp=small.stamp()
+    small_stamps.append(stamp)
+
+
+
+turtle.bgcolor("light yellow")
 turtle.color("purple")
+
 
 move_snake()
 
